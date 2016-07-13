@@ -550,9 +550,12 @@ void Net<Dtype>::FixSetup(int width) {
 
 template <typename Dtype>
 void Net<Dtype>::Fix() {
-  // Fix data
-  
-  // Fix params
+  for (int i = 0; i < layers_.size(); i++) {
+    // Fix params
+    layers_[i]->FixParams();
+    // Fix data
+    layers_[i]->FixData(bottom_vecs_[i], top_vecs_[i]);
+  }
 }
 
 template <typename Dtype>

@@ -320,6 +320,10 @@ class Layer {
     input_fixed_width = width;
     output_fixed_width = width;
   }
+  // Fix data and params
+  virtual void FixParams() {}
+  virtual void FixData(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
 
   // Fix input and output blobs
   virtual void FixInput(vector<Blob<Dtype>*>& bottom) {}
@@ -346,11 +350,7 @@ class Layer {
   // Fixed point position for input and output
   int input_fixed_pos;
   int output_fixed_pos;
-
-  // Fix data and params
-  virtual void FixData();
-  virtual void FixParams() {}
-
+  
   /** @brief Using the CPU device, compute the layer output. */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) = 0;

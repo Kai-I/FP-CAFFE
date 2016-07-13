@@ -23,8 +23,14 @@ void Layer<Dtype>::Unlock() {
 }
 
 template <typename Dtype>
-void Layer<Dtype>::FixData() {
-
+void Layer<Dtype>::FixData(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top) {
+  if (bottom.size() > 0) {
+    input_fixed_pos = bottom[0]->FixPos(input_fixed_width);
+  }
+  if (top.size() > 0) {
+    output_fixed_pos = top[0]->FixPos(output_fixed_width);
+  }
 }
 
 INSTANTIATE_CLASS(Layer);

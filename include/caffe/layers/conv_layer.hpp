@@ -72,9 +72,9 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
   }
   void FixInput(vector<Blob<Dtype>*>& bottom);
   void FixOutput(vector<Blob<Dtype>*>& top);
-  
- protected:
   void FixParams();
+
+ protected:
 
   // Fixed point width for weights and bias
   int weight_fixed_width;
