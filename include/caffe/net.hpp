@@ -43,6 +43,16 @@ class Net {
         << "will be removed in a future version. Use Forward().";
     return Forward(loss);
   }
+  
+  /**
+   * The function FixSetup() used for setting fixed point width in each layer
+   * The function Fix() used for deciding the fixed point parameters 
+   * and input/output 
+   */
+  void FixSetup(int width);
+  void Fix();
+  Dtype FixForwardFromTo(int start, int end);
+  const vector<Blob<Dtype>*>& FixForward(Dtype* loss = NULL);
 
   /**
    * The From and To variants of Forward and Backward operate on the

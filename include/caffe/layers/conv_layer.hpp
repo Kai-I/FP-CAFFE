@@ -65,8 +65,25 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
       : BaseConvolutionLayer<Dtype>(param) {}
 
   virtual inline const char* type() const { return "Convolution"; }
-
+  virtual inline void SetWidth(int width) {
+    Layer<Dtype>::SetWidth(width);
+    weight_fixed_width = width;
+    bias_fixed_width = width;
+  }
+  void FixInput(vector<Blob<Dtype>*>& bottom);
+  void FixOutput(vector<Blob<Dtype>*>& top);
+  
  protected:
+  void FixParams();
+
+  // Fixed point width for weights and bias
+  int weight_fixed_width;
+  int bias_fixed_width;
+
+  // Fixed point position for weights and bias
+  int weight_fixed_pos;
+  int bias_fixed_pos;
+
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,

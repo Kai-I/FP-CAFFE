@@ -72,6 +72,28 @@ void ConvolutionLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   }
 }
 
+template <typename Dtype>
+void ConvolutionLayer<Dtype>::FixParams() {
+  weight_fixed_pos = this->blobs_[0]->FixPos(weight_fixed_width);
+  this->blobs_[0]->Fix(weight_fixed_pos, weight_fixed_width);
+  bias_fixed_pos = this->blobs_[1]->FixPos(bias_fixed_width);
+  this->blobs_[1]->Fix(bias_fixed_pos, bias_fixed_width);
+}
+
+template <typename Dtype>
+void ConvolutionLayer<Dtype>::FixInput(vector<Blob<Dtype>*>& bottom) {
+  for (int i = 0; i < bottom.size(); i++) {
+    bottom[i]->Fix(this->input_fixed_pos, this->input_fixed_width);
+  }
+}
+
+template <typename Dtype>
+void ConvolutionLayer<Dtype>::FixOutput(vector<Blob<Dtype>*>& top) {
+  for (int i = 0; i < top.size(); i++) {
+    top[i]->Fix(this->output_fixed_pos, this->output_fixed_width);
+  }
+}
+
 #ifdef CPU_ONLY
 STUB_GPU(ConvolutionLayer);
 #endif

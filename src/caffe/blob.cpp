@@ -535,6 +535,24 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
   }
 }
 
+template <typename Dtype>
+int Blob<Dtype>::FixPos(int width) {
+  return 0;
+}
+
+template <typename Dtype>
+void Blob<Dtype>::Fix(int pos, int width) {
+  TruncData(mutable_cpu_data(), count_, pos, width);
+#ifndef CPU_ONLY
+  TruncData(mutable_gpu_data(), count_, pos, width);
+#endif
+}
+
+template <typename Dtype>
+void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
+
+}
+
 INSTANTIATE_CLASS(Blob);
 template class Blob<int>;
 template class Blob<unsigned int>;

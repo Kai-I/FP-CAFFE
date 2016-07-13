@@ -540,6 +540,50 @@ void Net<Dtype>::AppendParam(const NetParameter& param, const int layer_id,
   }
 }
 
+
+template <typename Dtype>
+void Net<Dtype>::FixSetup(int width) {
+  for (int i = 0; i < layers_.size(); i++) {
+    layers_[i]->SetWidth(width);
+  }
+}
+
+template <typename Dtype>
+void Net<Dtype>::Fix() {
+  // Fix data
+  
+  // Fix params
+}
+
+template <typename Dtype>
+Dtype Net<Dtype>::FixForwardFromTo(int start, int end) {
+  CHECK_GE(start, 0);
+  CHECK_LT(end, layers_.size());
+  Dtype loss = 0;
+  for (int i = start; i <= end; ++i) {
+    // LOG(ERROR) << "Forwarding " << layer_names_[i];
+    // Convert input to fixed point
+    layers_[i]->FixInput(bottom_vecs_[i]);
+    Dtype layer_loss = layers_[i]->Forward(bottom_vecs_[i], top_vecs_[i]);
+    // Convert output to fixed point
+    layers_[i]->FixOutput(top_vecs_[i]);
+    loss += layer_loss;
+    if (debug_info_) { ForwardDebugInfo(i); }
+  }
+  return loss;
+}
+
+template <typename Dtype>
+const vector<Blob<Dtype>*>& Net<Dtype>::FixForward(Dtype* loss) {
+  if (loss != NULL) {
+    *loss = FixForwardFromTo(0, layers_.size() - 1);
+  } else {
+    FixForwardFromTo(0, layers_.size() - 1);
+  }
+  return net_output_blobs_;
+}
+
+
 template <typename Dtype>
 Dtype Net<Dtype>::ForwardFromTo(int start, int end) {
   CHECK_GE(start, 0);

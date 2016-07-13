@@ -316,7 +316,15 @@ class Layer {
     param_propagate_down_[param_id] = value;
   }
 
+  virtual inline void SetWidth(int width) {
+    input_fixed_width = width;
+    output_fixed_width = width;
+  }
 
+  // Fix input and output blobs
+  virtual void FixInput(vector<Blob<Dtype>*>& bottom) {}
+  virtual void FixOutput(vector<Blob<Dtype>*>& top) {}
+  
  protected:
   /** The protobuf that stores the layer parameters */
   LayerParameter layer_param_;
@@ -330,6 +338,18 @@ class Layer {
   /** The vector that indicates whether each top blob has a non-zero weight in
    *  the objective function. */
   vector<Dtype> loss_;
+
+  // Fixed point width for input and output
+  int input_fixed_width;
+  int output_fixed_width;
+
+  // Fixed point position for input and output
+  int input_fixed_pos;
+  int output_fixed_pos;
+
+  // Fix data and params
+  virtual void FixData();
+  virtual void FixParams() {}
 
   /** @brief Using the CPU device, compute the layer output. */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,

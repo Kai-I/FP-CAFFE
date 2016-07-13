@@ -22,6 +22,11 @@ void Layer<Dtype>::Unlock() {
   }
 }
 
+template <typename Dtype>
+void Layer<Dtype>::FixData() {
+
+}
+
 INSTANTIATE_CLASS(Layer);
 
 }  // namespace caffe
