@@ -710,7 +710,7 @@ template <typename Dtype>
 void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
   std::ifstream file(fixinfo_filename.c_str(), std::ios::in);
   string line;
-  
+
   while (std::getline(file, line))
   {
     std::stringstream ss;
@@ -719,7 +719,7 @@ void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
     string name;
     ss >> i >> name;
     ss >> layers_[i]->input_fixed_width >> layers_[i]->input_fixed_pos >> layers_[i]->output_fixed_width >> layers_[i]->output_fixed_pos;
-    
+
     if(strcmp(layers_[i]->type(), "Convolution"))
     {
       shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);

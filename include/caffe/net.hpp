@@ -43,11 +43,11 @@ class Net {
         << "will be removed in a future version. Use Forward().";
     return Forward(loss);
   }
-  
+
   /**
    * The function FixSetup() used for setting fixed point width in each layer
-   * The function Fix() used for deciding the fixed point parameters 
-   * and input/output 
+   * The function Fix() used for deciding the fixed point parameters
+   * and input/output
    */
   void FixSetup(int width);
   void Fix();

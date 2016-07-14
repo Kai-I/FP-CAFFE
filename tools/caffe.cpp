@@ -439,7 +439,7 @@ int testfix() {
 
   // Load fix info from file
   caffe_net.LoadFixInfo(FLAGS_fixinfo);
-  
+
   vector<int> test_score_output_id;
   vector<float> test_score;
   float loss = 0;
