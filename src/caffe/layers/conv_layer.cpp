@@ -82,6 +82,7 @@ void ConvolutionLayer<Dtype>::FixParams() {
 
 template <typename Dtype>
 void ConvolutionLayer<Dtype>::FixInput(vector<Blob<Dtype>*>& bottom) {
+  if (0 == this->input_fixed_width) return;
   for (int i = 0; i < bottom.size(); i++) {
     bottom[i]->Fix(this->input_fixed_pos, this->input_fixed_width);
   }
@@ -89,6 +90,7 @@ void ConvolutionLayer<Dtype>::FixInput(vector<Blob<Dtype>*>& bottom) {
 
 template <typename Dtype>
 void ConvolutionLayer<Dtype>::FixOutput(vector<Blob<Dtype>*>& top) {
+  if (0 == this->output_fixed_width) return;
   for (int i = 0; i < top.size(); i++) {
     top[i]->Fix(this->output_fixed_pos, this->output_fixed_width);
   }
