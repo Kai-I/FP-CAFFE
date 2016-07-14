@@ -710,35 +710,22 @@ template <typename Dtype>
 void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
   std::ifstream file(fixinfo_filename.c_str(), std::ios::in);
   string line;
+  
   while (std::getline(file, line))
   {
-    char seps[]="\t";
-
-    char *token;
-
-    token = std::strtok(line, seps );
-    while(token!=NULL)
+    std::stringstream ss;
+    ss << line;
+    int i;
+    string name;
+    ss >> i >> name >> layers_[i]->input_fixed_width >> layers_[i]->input_fixed_pos >> layers_[i]->output_fixed_width >> layers_[i]->output_fixed_pos;
+    if(name.find("conv")>=0)
     {
-      vectWords->push_back(token);
-      token=std::strtok(NULL,seps);
-    }
-
-      // process pair (a,b)
-  
-    file << i << "\t";
-    file << layer_names_[i] << "\t";
-    file << layers_[i]->input_fixed_width << "\t";
-    file << layers_[i]->input_fixed_pos << "\t";
-    file << layers_[i]->output_fixed_width << "\t";
-    file << layers_[i]->output_fixed_pos << "\t";
-    if (strcmp(layers_[i]->type(),"Convolution") == 0){
       shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
-      file << ptr->weight_fixed_width << "\t";
-      file << ptr->weight_fixed_pos << "\t";
-      file << ptr->bias_fixed_width << "\t";
-      file << ptr->bias_fixed_pos << "\t";
+      ss >> ptr->weight_fixed_width;
+      ss >> ptr->weight_fixed_pos;
+      ss >> ptr->bias_fixed_width;
+      ss >> ptr->bias_fixed_pos;
     }
-    file << endl;
   }
   file.close();
 }
