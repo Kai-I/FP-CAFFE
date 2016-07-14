@@ -386,6 +386,12 @@ int fix() {
   }
   loss /= FLAGS_iterations;
   LOG(INFO) << "Loss: " << loss;
+
+  // Fix caffe net
+  caffe_net.Fix();
+  // Save fix into to file
+  caffe_net.SaveFixInfo(FLAGS_fixinfo);
+
   for (int i = 0; i < test_score.size(); ++i) {
     const std::string& output_name = caffe_net.blob_names()[
         caffe_net.output_blob_indices()[test_score_output_id[i]]];
@@ -431,6 +437,9 @@ int testfix() {
   caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
   LOG(INFO) << "Running for " << FLAGS_iterations << " iterations.";
 
+  // Load fix info from file
+  caffe_net.LoadFixInfo(FLAGS_fixinfo);
+  
   vector<int> test_score_output_id;
   vector<float> test_score;
   float loss = 0;
