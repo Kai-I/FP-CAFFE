@@ -54,6 +54,8 @@ DEFINE_string(sigint_effect, "stop",
 DEFINE_string(sighup_effect, "snapshot",
              "Optional; action to take when a SIGHUP signal is received: "
              "snapshot, stop or none.");
+DEFINE_string(fixinfo, "",
+    "Optional; the fixed point information to store or load.");
 
 // A simple registry for caffe commands.
 typedef int (*BrewFunction)();
@@ -333,6 +335,7 @@ RegisterBrewFunction(test);
 int fix() {
   CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to score.";
   CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to score.";
+  CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
   vector<string> stages = get_stages_from_flags();
 
   // Set device id and mode
