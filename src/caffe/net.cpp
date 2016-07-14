@@ -19,6 +19,8 @@
 
 #include "caffe/test/test_caffe_main.hpp"
 
+#include "caffe/layers/conv_layer.hpp"
+
 namespace caffe {
 
 template <typename Dtype>
@@ -683,12 +685,62 @@ const vector<Blob<Dtype>*>& Net<Dtype>::FixForward(Dtype* loss) {
 
 template <typename Dtype>
 void Net<Dtype>::SaveFixInfo(const string fixinfo_filename) {
-
+  std::ofstream file(fixinfo_filename.c_str(), std::ios::out);
+  for(int i = 0; i<layers_.size(); i++)
+  {
+    file << i << "\t";
+    file << layer_names_[i] << "\t";
+    file << layers_[i]->input_fixed_width << "\t";
+    file << layers_[i]->input_fixed_pos << "\t";
+    file << layers_[i]->output_fixed_width << "\t";
+    file << layers_[i]->output_fixed_pos << "\t";
+    if (strcmp(layers_[i]->type(),"Convolution") == 0){
+      shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
+      file << ptr->weight_fixed_width << "\t";
+      file << ptr->weight_fixed_pos << "\t";
+      file << ptr->bias_fixed_width << "\t";
+      file << ptr->bias_fixed_pos << "\t";
+    }
+    file << endl;
+  }
+  file.close();
 }
 
 template <typename Dtype>
 void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
+  std::ifstream file(fixinfo_filename.c_str(), std::ios::in);
+  string line;
+  while (std::getline(file, line))
+  {
+    char seps[]="\t";
 
+    char *token;
+
+    token = std::strtok(line, seps );
+    while(token!=NULL)
+    {
+      vectWords->push_back(token);
+      token=std::strtok(NULL,seps);
+    }
+
+      // process pair (a,b)
+  
+    file << i << "\t";
+    file << layer_names_[i] << "\t";
+    file << layers_[i]->input_fixed_width << "\t";
+    file << layers_[i]->input_fixed_pos << "\t";
+    file << layers_[i]->output_fixed_width << "\t";
+    file << layers_[i]->output_fixed_pos << "\t";
+    if (strcmp(layers_[i]->type(),"Convolution") == 0){
+      shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
+      file << ptr->weight_fixed_width << "\t";
+      file << ptr->weight_fixed_pos << "\t";
+      file << ptr->bias_fixed_width << "\t";
+      file << ptr->bias_fixed_pos << "\t";
+    }
+    file << endl;
+  }
+  file.close();
 }
 
 template <typename Dtype>
