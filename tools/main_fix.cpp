@@ -92,9 +92,8 @@ int main(int argc, char** argv) {
 	vector<Blob<float>*> output_label = net->top_vecs()[2];
 	const float* output_d_label = output_label[0]->cpu_data();
 
-	for (int i = 0;i < 10;i++){
-		output_d_label = ;
-	}
+	top_k(output_d_label, 1000, 5);
+
 	
 	return 0;
 }
