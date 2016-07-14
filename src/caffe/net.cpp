@@ -550,13 +550,108 @@ void Net<Dtype>::FixSetup(int width) {
 
 template <typename Dtype>
 void Net<Dtype>::Fix() {
-  for (int i = 0; i < layers_.size(); i++) {
-    // Fix params
-    layers_[i]->FixParams();
-    // Fix data
-    layers_[i]->FixData(bottom_vecs_[i], top_vecs_[i]);
-  }
+  concat_top_.clear();
+	concat_bottom_.clear();
+	split_top_.clear();
+	split_bottom_.clear();
+
+	//fix single layers and find out concat & split layers
+    for (int i = 0; i < layers_.size(); ++i) {
+
+		shared_ptr<Layer<Dtype> > thislayer = layers_[i];
+
+        layers_[i]->FixParams();
+		layers_[i]->FixData( bottom_vecs()[i], top_vecs()[i]);
+
+		pair<vector<int>, int> cat_top; cat_top.first.clear();
+		pair<vector<int>, int> cat_bottom; cat_bottom.first.clear();
+		pair<vector<int>, int> spl_top; spl_top.first.clear();
+		pair<vector<int>, int> spl_bottom; spl_bottom.first.clear();
+
+		if (strcmp(layers_[i]->type(),"Concat") == 0){
+			layers_[i]->input_fixed_pos = layers_[i]->output_fixed_pos;
+
+			//find concat top
+			for (int topindex = 0; topindex < top_vecs()[i].size(); topindex++){
+				cat_top.first.push_back((top_ids(i)[topindex]));
+			}
+			sort(cat_top.first.begin(), cat_top.first.end());
+			cat_top.second = i;
+			concat_top_.push_back(cat_top);
+			//find concat bottom
+			for (int bottomindex = 0; bottomindex < bottom_vecs()[i].size(); bottomindex++){
+				cat_bottom.first.push_back((bottom_ids(i)[bottomindex]));
+			}
+			sort(cat_bottom.first.begin(), cat_bottom.first.end());
+			cat_bottom.second = i;
+			concat_bottom_.push_back(cat_bottom);
+		}
+
+		if (strcmp(layers_[i]->type(), "Split") == 0){
+			//find split top
+			for (int topindex = 0; topindex < top_vecs()[i].size(); topindex++){
+				spl_top.first.push_back((top_ids(i)[topindex]));
+			}
+			sort(spl_top.first.begin(), spl_top.first.end());
+			spl_top.second = i;
+			split_top_.push_back(spl_top);
+			//find split bottom
+			for (int bottomindex = 0; bottomindex < bottom_vecs()[i].size(); bottomindex++){
+				spl_bottom.first.push_back((bottom_ids(i)[bottomindex]));
+			}
+			sort(spl_bottom.first.begin(), spl_bottom.first.end());
+			spl_bottom.second = i;
+			split_bottom_.push_back(spl_bottom);
+		}
+    }
+
+	// reunin concat and split
+	for (int i = 0; i < concat_top_.size(); i++){
+		for (int j = 0; j < split_bottom_.size(); j++){
+			vector<int> tmp;
+
+			//merge top
+			set_union(concat_top_[i].first.begin(), concat_top_[i].first.end(), split_bottom_[j].first.begin(), split_bottom_[j].first.end(), back_inserter(tmp));
+			//if has same element
+			if (tmp.size() < concat_top_[i].first.size() + split_bottom_[i].first.size()){
+				tmp.clear();
+				set_union(concat_top_[i].first.begin(), concat_top_[i].first.end(), split_top_[j].first.begin(), split_top_[j].first.end(), back_inserter(tmp));
+				concat_top_[i].first = tmp;
+			}
+
+
+			//merge bottom
+			set_union(concat_bottom_[i].first.begin(), concat_bottom_[i].first.end(), split_top_[j].first.begin(), split_top_[j].first.end(), back_inserter(tmp));
+			//if has same element
+			if (tmp.size() < concat_bottom_[i].first.size() + split_top_[i].first.size()){
+				tmp.clear();
+				set_union(concat_bottom_[i].first.begin(), concat_bottom_[i].first.end(), split_bottom_[j].first.begin(), split_bottom_[j].first.end(), back_inserter(tmp));
+				concat_bottom_[i].first = tmp;
+			}
+		}
+	}
+
+	Fixconcat();
 }
+
+template <typename Dtype>
+void Net<Dtype>::Fixconcat(){
+  //reset conv fixparam;
+	for (int i = 0; i < layers_.size(); ++i) {
+		for (int concat_count = 0; concat_count < concat_bottom_.size(); concat_count++){
+			if (find(concat_bottom_[concat_count].first.begin(), concat_bottom_[concat_count].first.end(), top_ids(i)[0]) != concat_bottom_[concat_count].first.end()){
+				if (layers_[i]->output_fixed_pos != layers_[concat_bottom_[concat_count].second]->output_fixed_pos){
+					layers_[i]->output_fixed_pos = (layers_[concat_bottom_[concat_count].second]->output_fixed_pos);
+					if (top_ids(i)[0] == bottom_ids(i)[0]){
+						layers_[i]->input_fixed_pos = layers_[i]->output_fixed_pos;
+					}
+				}
+			}
+		}
+
+	}
+}
+
 
 template <typename Dtype>
 Dtype Net<Dtype>::FixForwardFromTo(int start, int end) {

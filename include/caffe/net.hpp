@@ -51,6 +51,7 @@ class Net {
    */
   void FixSetup(int width);
   void Fix();
+  void Fixconcat();
   Dtype FixForwardFromTo(int start, int end);
   const vector<Blob<Dtype>*>& FixForward(Dtype* loss = NULL);
 
@@ -318,6 +319,15 @@ class Net {
   bool debug_info_;
   /// The root net that actually holds the shared layers in data parallelism
   const Net* const root_net_;
+
+  /// This is new add, Get net topology
+    // a list to find regist each concat layer bottom blobs name and concat blobs fix pos
+  vector< pair<vector<int>, int> > concat_bottom_;
+  vector< pair<vector<int>, int> > concat_top_;
+  vector< pair<vector<int>, int> > split_bottom_;
+  vector< pair<vector<int>, int> > split_top_;
+
+
   DISABLE_COPY_AND_ASSIGN(Net);
 };
 

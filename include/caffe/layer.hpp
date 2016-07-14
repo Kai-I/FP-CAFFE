@@ -328,6 +328,15 @@ class Layer {
   // Fix input and output blobs
   virtual void FixInput(vector<Blob<Dtype>*>& bottom) {}
   virtual void FixOutput(vector<Blob<Dtype>*>& top) {}
+
+  // Fixed point width for input and output
+  int input_fixed_width;
+  int output_fixed_width;
+
+  // Fixed point position for input and output
+  int input_fixed_pos;
+  int output_fixed_pos;
+  
   
  protected:
   /** The protobuf that stores the layer parameters */
@@ -343,14 +352,6 @@ class Layer {
    *  the objective function. */
   vector<Dtype> loss_;
 
-  // Fixed point width for input and output
-  int input_fixed_width;
-  int output_fixed_width;
-
-  // Fixed point position for input and output
-  int input_fixed_pos;
-  int output_fixed_pos;
-  
   /** @brief Using the CPU device, compute the layer output. */
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) = 0;

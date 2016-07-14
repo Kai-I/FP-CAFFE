@@ -537,6 +537,10 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
 
 template <typename Dtype>
 int Blob<Dtype>::FixPos(int width) {
+  float Bmax1,Bmax2;
+  int bitvalid;
+  int aimlen;
+  int fraclen;
   return 0;
 }
 
