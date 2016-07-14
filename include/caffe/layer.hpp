@@ -326,8 +326,8 @@ class Layer {
       const vector<Blob<Dtype>*>& top);
 
   // Fix input and output blobs
-  virtual void FixInput(vector<Blob<Dtype>*>& bottom) {}
-  virtual void FixOutput(vector<Blob<Dtype>*>& top) {}
+  virtual void FixInput(const vector<Blob<Dtype>*>& bottom) {}
+  virtual void FixOutput(const vector<Blob<Dtype>*>& top) {}
 
   // Fixed point width for input and output
   int input_fixed_width;

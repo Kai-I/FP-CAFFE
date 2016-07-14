@@ -82,7 +82,9 @@ int main(int argc, char** argv) {
 	float floatacctotal_1 = 0;
 
 	int layer_size = net->layers().size();
+	net->FixSetup(0);
 	net->Forward();
+	net->FixSetup(8);
 	net->Fix();
 
 	return 0;

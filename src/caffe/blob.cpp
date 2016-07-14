@@ -567,6 +567,9 @@ int Blob<Dtype>::FixPos(int width) {
 
 template <typename Dtype>
 void Blob<Dtype>::Fix(int pos, int width) {
+  if(width <= 0){
+    return;
+  }
   TruncData(mutable_cpu_data(), count_, pos, width);
 #ifndef CPU_ONLY
   TruncData(mutable_gpu_data(), count_, pos, width);

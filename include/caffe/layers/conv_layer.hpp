@@ -70,11 +70,9 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
     weight_fixed_width = width;
     bias_fixed_width = width;
   }
-  void FixInput(vector<Blob<Dtype>*>& bottom);
-  void FixOutput(vector<Blob<Dtype>*>& top);
+  void FixInput(const vector<Blob<Dtype>*>& bottom);
+  void FixOutput(const vector<Blob<Dtype>*>& top);
   void FixParams();
-
- protected:
 
   // Fixed point width for weights and bias
   int weight_fixed_width;
@@ -83,6 +81,8 @@ class ConvolutionLayer : public BaseConvolutionLayer<Dtype> {
   // Fixed point position for weights and bias
   int weight_fixed_pos;
   int bias_fixed_pos;
+
+ protected:
 
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);

@@ -24,6 +24,9 @@ void ConvolutionLayer<Dtype>::compute_output_shape() {
 template <typename Dtype>
 void ConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+
+  FixInput(bottom);
+
   const Dtype* weight = this->blobs_[0]->cpu_data();
   for (int i = 0; i < bottom.size(); ++i) {
     const Dtype* bottom_data = bottom[i]->cpu_data();
@@ -37,6 +40,8 @@ void ConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       }
     }
   }
+
+  FixOutput(bottom);
 }
 
 template <typename Dtype>
@@ -81,7 +86,7 @@ void ConvolutionLayer<Dtype>::FixParams() {
 }
 
 template <typename Dtype>
-void ConvolutionLayer<Dtype>::FixInput(vector<Blob<Dtype>*>& bottom) {
+void ConvolutionLayer<Dtype>::FixInput(const vector<Blob<Dtype>*>& bottom) {
   if (0 == this->input_fixed_width) return;
   for (int i = 0; i < bottom.size(); i++) {
     bottom[i]->Fix(this->input_fixed_pos, this->input_fixed_width);
@@ -89,7 +94,7 @@ void ConvolutionLayer<Dtype>::FixInput(vector<Blob<Dtype>*>& bottom) {
 }
 
 template <typename Dtype>
-void ConvolutionLayer<Dtype>::FixOutput(vector<Blob<Dtype>*>& top) {
+void ConvolutionLayer<Dtype>::FixOutput(const vector<Blob<Dtype>*>& top) {
   if (0 == this->output_fixed_width) return;
   for (int i = 0; i < top.size(); i++) {
     top[i]->Fix(this->output_fixed_pos, this->output_fixed_width);
