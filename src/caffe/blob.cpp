@@ -602,12 +602,9 @@ Dtype fff(const Dtype f, int fragpos, int bitlen) {
 
 template <typename Dtype>
 void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
-  int leng = count;
-  int fragpos = pos;
-  Dtype* f = data;
-  for (int i = 0; i < leng; i++){
-      data[i] = fff(f[i],fragpos,width);
-    }
+  for (int i = 0; i < count; i++) {
+      data[i] = fff(data[i], pos, width);
+  }
 }
 
 INSTANTIATE_CLASS(Blob);

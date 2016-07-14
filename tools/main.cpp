@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include "caffe/layers/conv_layer.hpp"
+
 
 using namespace std;
 using namespace caffe;
@@ -87,6 +89,8 @@ int main(int argc, char** argv) {
 	net->FixSetup(8);
 	net->Fix();
 
+	net->SaveFixInfo("info.txt");
+	
 	return 0;
 }
 
