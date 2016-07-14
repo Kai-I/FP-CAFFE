@@ -29,8 +29,8 @@ class InnerProductLayer : public Layer<Dtype> {
   virtual inline int ExactNumBottomBlobs() const { return 1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
   virtual inline void SetWidth(int width) {
-    input_fixed_width = 0;
-    output_fixed_width = 0;
+    this->input_fixed_width = 0;
+    this->output_fixed_width = 0;
   }
 
  protected:
