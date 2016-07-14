@@ -336,8 +336,7 @@ class Layer {
   // Fixed point position for input and output
   int input_fixed_pos;
   int output_fixed_pos;
-  
-  
+
  protected:
   /** The protobuf that stores the layer parameters */
   LayerParameter layer_param_;
