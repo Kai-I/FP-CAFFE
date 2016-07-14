@@ -90,6 +90,8 @@ int main(int argc, char** argv) {
 	net->Fix();
 
 	net->SaveFixInfo("info.txt");
+	net->LoadFixInfo("info.txt");
+	net->SaveFixInfo("check.txt");
 	
 	return 0;
 }
