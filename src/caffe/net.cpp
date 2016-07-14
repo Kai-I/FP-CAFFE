@@ -681,6 +681,15 @@ const vector<Blob<Dtype>*>& Net<Dtype>::FixForward(Dtype* loss) {
   return net_output_blobs_;
 }
 
+template <typename Dtype>
+void Net<Dtype>::SaveFixInfo(const string fixinfo_filename) {
+
+}
+
+template <typename Dtype>
+void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
+
+}
 
 template <typename Dtype>
 Dtype Net<Dtype>::ForwardFromTo(int start, int end) {

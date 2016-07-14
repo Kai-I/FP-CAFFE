@@ -55,6 +55,10 @@ class Net {
   Dtype FixForwardFromTo(int start, int end);
   const vector<Blob<Dtype>*>& FixForward(Dtype* loss = NULL);
 
+  // Save and Load fixed point information from/to file
+  void SaveFixInfo(const string fixinfo_filename);
+  void LoadFixInfo(const string fixinfo_filename);
+
   /**
    * The From and To variants of Forward and Backward operate on the
    * (topological) ordering by which the net is specified. For general DAG
