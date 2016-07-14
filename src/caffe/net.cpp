@@ -718,7 +718,7 @@ void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
     int i;
     string name;
     ss >> i >> name >> layers_[i]->input_fixed_width >> layers_[i]->input_fixed_pos >> layers_[i]->output_fixed_width >> layers_[i]->output_fixed_pos;
-    if(name.find("conv")>=0)
+    if(strcmp(layers_[i]->type(), "Convolution"))
     {
       shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
       ss >> ptr->weight_fixed_width;
