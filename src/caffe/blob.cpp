@@ -535,13 +535,34 @@ void Blob<float>::ToProto(BlobProto* proto, bool write_diff) const {
   }
 }
 
+
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
 template <typename Dtype>
 int Blob<Dtype>::FixPos(int width) {
-  float Bmax1,Bmax2;
+  Dtype Bmax1,Bmax2;
   int bitvalid;
   int aimlen;
   int fraclen;
-  return 0;
+  Dtype max_all = 0;
+  Dtype min_all = 0;
+  int length = this->count();
+  Dtype* input = this->mutable_cpu_data();
+  for (int i = 0; i < length; i++){
+    if (input[i] > max_all){
+      max_all = input[i];
+    }
+    if (input[i] < min_all){
+      min_all = input[i];
+    }
+  }
+  Bmax1 = fabs(max_all);
+  Bmax2 = fabs(min_all);
+
+  Dtype Bmax = max(Bmax1, Bmax2);
+  bitvalid = width - 1;
+  aimlen = ceil(log(Bmax) / log(2));
+  fraclen = (bitvalid - aimlen);
+  return fraclen;
 }
 
 template <typename Dtype>
@@ -553,8 +574,37 @@ void Blob<Dtype>::Fix(int pos, int width) {
 }
 
 template <typename Dtype>
-void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
+Dtype fff(const Dtype f, int fragpos, int bitlen) {
+	int bitvalid = bitlen - 1;
+	int maxnum = ((1) << bitvalid) - 1;
+	int minnum = -(1 << bitvalid);
+	int a = 0;
+	if (fragpos >= 0) a = round(f * (1 << fragpos));
+	else a = round(f / (1 << -fragpos));
 
+	if (a > maxnum){
+		a = maxnum;
+	}
+	else if (a < minnum){
+		a = minnum;
+	}
+
+	Dtype result;
+
+	if (fragpos >= 0) result = Dtype(a) / Dtype(1 << fragpos);
+	else result = Dtype(a) * Dtype(1 << -fragpos);
+	return result;
+}
+
+
+template <typename Dtype>
+void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
+  int leng = count;
+  int fragpos = pos;
+  Dtype* f = data;
+  for (int i = 0; i < leng; i++){
+      data[i] = fff(f[i],fragpos,width);
+    }
 }
 
 INSTANTIATE_CLASS(Blob);
