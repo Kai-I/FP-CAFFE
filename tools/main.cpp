@@ -88,9 +88,11 @@ int main(int argc, char** argv) {
 	net->Forward();
 	net->FixSetup(8);
 	net->Fix();
-
+	
 	net->SaveFixInfo("info.txt");
+
 	net->LoadFixInfo("info.txt");
+	
 	net->SaveFixInfo("check.txt");
 	
 	return 0;
