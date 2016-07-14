@@ -41,7 +41,7 @@ void ConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
   }
 
-  FixOutput(bottom);
+  FixOutput(top);
 }
 
 template <typename Dtype>

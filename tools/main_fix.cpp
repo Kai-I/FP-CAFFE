@@ -84,31 +84,17 @@ int main(int argc, char** argv) {
 	float floatacctotal_1 = 0;
 
 	int layer_size = net->layers().size();
+	
+	net->LoadFixInfo("info.txt");
 
-	//run a total float net
-	net->FixSetup(0);
 	net->Forward();
 
-	vector<Blob<float>*> output_label = net->top_vecs()[73];
+	vector<Blob<float>*> output_label = net->top_vecs()[2];
 	const float* output_d_label = output_label[0]->cpu_data();
-	for (int i = 0; i < 5; i++)
-	{
-		top_k(output_d_label, 1000, 5);
 
-		output_d_label += 1000;
+	for (int i = 0;i < 10;i++){
+		output_d_label = ;
 	}
-
-	//fix the net with 8 bits
-	net->FixSetup(8);
-	net->Fix();
-	//save the parameter
-	net->SaveFixInfo("info.txt");
-
-
-
-	net->LoadFixInfo("info.txt");
-	
-	net->SaveFixInfo("check.txt");
 	
 	return 0;
 }
