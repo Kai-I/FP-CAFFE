@@ -56,6 +56,8 @@ DEFINE_string(sighup_effect, "snapshot",
              "snapshot, stop or none.");
 DEFINE_string(fixinfo, "",
     "Optional; the fixed point information to store or load.");
+DEFINE_string(fixweights, "",
+    "Optional: the fixed weights to store or load.");
 
 // A simple registry for caffe commands.
 typedef int (*BrewFunction)();
@@ -336,6 +338,7 @@ int fix() {
   CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to score.";
   CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to score.";
   CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
+  CHECK_GT(FLAGS_fixweights.size(), 0) << "Need store a fix weights file.";
   vector<string> stages = get_stages_from_flags();
 
   // Set device id and mode
@@ -391,6 +394,10 @@ int fix() {
   caffe_net.Fix();
   // Save fix into to file
   caffe_net.SaveFixInfo(FLAGS_fixinfo);
+  // Save new fixed weights
+	NetParameter net_param;
+	caffe_net.ToProto(&net_param, false);
+	WriteProtoToBinaryFile(net_param, FLAGS_fixweights.c_str());
 
   for (int i = 0; i < test_score.size(); ++i) {
     const std::string& output_name = caffe_net.blob_names()[
@@ -414,6 +421,7 @@ RegisterBrewFunction(fix);
 int testfix() {
   CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to score.";
   CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to score.";
+  CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
   vector<string> stages = get_stages_from_flags();
 
   // Set device id and mode
@@ -446,7 +454,7 @@ int testfix() {
   for (int i = 0; i < FLAGS_iterations; ++i) {
     float iter_loss;
     const vector<Blob<float>*>& result =
-        caffe_net.FixForward(&iter_loss);
+        caffe_net.Forward(&iter_loss);
     loss += iter_loss;
     int idx = 0;
     for (int j = 0; j < result.size(); ++j) {
