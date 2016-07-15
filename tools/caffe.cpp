@@ -54,10 +54,12 @@ DEFINE_string(sigint_effect, "stop",
 DEFINE_string(sighup_effect, "snapshot",
              "Optional; action to take when a SIGHUP signal is received: "
              "snapshot, stop or none.");
+DEFINE_int32(fixwidth, 8,
+    "The fixed point data width.");
 DEFINE_string(fixinfo, "",
-    "Optional; the fixed point information to store or load.");
+    "The fixed point information to store or load.");
 DEFINE_string(fixweights, "",
-    "Optional: the fixed weights to store or load.");
+    "The fixed weights to store or load.");
 
 // A simple registry for caffe commands.
 typedef int (*BrewFunction)();
@@ -360,12 +362,14 @@ int fix() {
   // Instantiate the caffe net.
   Net<float> caffe_net(FLAGS_model, caffe::TEST, FLAGS_level, &stages);
   caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
-  LOG(INFO) << "Running for " << FLAGS_iterations << " iterations.";
+  //LOG(INFO) << "Running for " << FLAGS_iterations << " iterations.";
+  LOG(INFO) << "Forward running before fix.";
+  caffe_net.FixSetup(0);
 
   vector<int> test_score_output_id;
   vector<float> test_score;
   float loss = 0;
-  for (int i = 0; i < FLAGS_iterations; ++i) {
+  //for (int i = 0; i < FLAGS_iterations; ++i) {
     float iter_loss;
     const vector<Blob<float>*>& result =
         caffe_net.Forward(&iter_loss);
@@ -375,29 +379,19 @@ int fix() {
       const float* result_vec = result[j]->cpu_data();
       for (int k = 0; k < result[j]->count(); ++k, ++idx) {
         const float score = result_vec[k];
-        if (i == 0) {
+        //if (i == 0) {
           test_score.push_back(score);
           test_score_output_id.push_back(j);
-        } else {
-          test_score[idx] += score;
-        }
+        //} else {
+        //  test_score[idx] += score;
+        //}
         const std::string& output_name = caffe_net.blob_names()[
             caffe_net.output_blob_indices()[j]];
-        LOG(INFO) << "Batch " << i << ", " << output_name << " = " << score;
+        LOG(INFO) << "One batch, " << output_name << " = " << score;
       }
     }
-  }
-  loss /= FLAGS_iterations;
-  LOG(INFO) << "Loss: " << loss;
-
-  // Fix caffe net
-  caffe_net.Fix();
-  // Save fix into to file
-  caffe_net.SaveFixInfo(FLAGS_fixinfo);
-  // Save new fixed weights
-	NetParameter net_param;
-	caffe_net.ToProto(&net_param, false);
-	WriteProtoToBinaryFile(net_param, FLAGS_fixweights.c_str());
+  //}
+  //loss /= FLAGS_iterations;
 
   for (int i = 0; i < test_score.size(); ++i) {
     const std::string& output_name = caffe_net.blob_names()[
@@ -405,13 +399,25 @@ int fix() {
     const float loss_weight = caffe_net.blob_loss_weights()[
         caffe_net.output_blob_indices()[test_score_output_id[i]]];
     std::ostringstream loss_msg_stream;
-    const float mean_score = test_score[i] / FLAGS_iterations;
+    const float mean_score = test_score[i]; // / FLAGS_iterations;
     if (loss_weight) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";
     }
     LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
   }
+
+  LOG(INFO) << "Loss: " << loss;
+  LOG(INFO) << "Fix caffe network with " << FLAGS_fixwidth << " bits.";
+  // Fix caffe net
+  caffe_net.FixSetup(FLAGS_fixwidth);
+  caffe_net.Fix();
+  // Save fix into to file
+  caffe_net.SaveFixInfo(FLAGS_fixinfo);
+  // Save new fixed weights
+	caffe::NetParameter net_param;
+	caffe_net.ToProto(&net_param, false);
+	caffe::WriteProtoToBinaryFile(net_param, FLAGS_fixweights.c_str());
 
   return 0;
 }
