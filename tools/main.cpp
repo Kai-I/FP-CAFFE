@@ -89,21 +89,29 @@ int main(int argc, char** argv) {
 	net->FixSetup(0);
 	net->Forward();
 
-	vector<Blob<float>*> output_label = net->top_vecs()[73];
-	const float* output_d_label = output_label[0]->cpu_data();
-	for (int i = 0; i < 5; i++)
-	{
-		top_k(output_d_label, 1000, 5);
+	int show_layer = 73;
 
-		output_d_label += 1000;
+	vector<Blob<float>*> output_label = net->top_vecs()[show_layer];
+	const float* output_d_label = output_label[0]->cpu_data();
+	
+	ofstream file("output_float.txt", ios::out);
+
+	for (int i = 0; i < 10000; i++){
+		file << output_d_label[i] << endl;
 	}
 
+	file.close();
 	//fix the net with 8 bits
 	net->FixSetup(8);
 	net->Fix();
 	//save the parameter
 	net->SaveFixInfo("info.txt");
-
+	
+	
+	NetParameter net_param;
+	net->ToProto(&net_param, false);
+	string filename = "suibian.caffemodel";
+	WriteProtoToBinaryFile(net_param, filename.c_str());
 
 
 	net->LoadFixInfo("info.txt");

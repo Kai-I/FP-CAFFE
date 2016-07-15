@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
 
 #include "caffe/layers/conv_layer.hpp"
 
@@ -89,11 +90,55 @@ int main(int argc, char** argv) {
 
 	net->Forward();
 
-	vector<Blob<float>*> output_label = net->top_vecs()[2];
-	const float* output_d_label = output_label[0]->cpu_data();
 
-	top_k(output_d_label, 1000, 5);
+	int show_layer = 73;
 
+
+	vector<Blob<float>*> label_blob = net->top_vecs()[show_layer];
+	const float* label_point = label_blob[0]->cpu_data();
+
+	ofstream file("output_fixed_float.txt", ios::out);
+
+	for (int i = 0; i < 10000; i++){
+		file << label_point[i] << endl;
+	}
+
+	file.close();
+
+	label_blob = net->bottom_vecs()[show_layer];
+	label_point = label_blob[0]->cpu_data();
+
+	file.open("input_fixed_float.txt", ios::out);
+
+	for (int i = 0; i < 10000; i++){
+		file << label_point[i] << endl;
+	}
+
+	file.close();
+
+/*
+	label_blob = net->layers()[2]->blobs();
+	label_point = label_blob[0]->cpu_data();
+
+	file.open("weights_fixed.txt", ios::out);
+
+	for (int i = 0; i < 1000; i++){
+		file << label_point[i] << endl;
+	}
+
+	file.close();
+
+	label_blob = net->layers()[2]->blobs();
+	label_point = label_blob[1]->cpu_data();
+
+	file.open("weights_fixed.txt", ios::out);
+
+	for (int i = 0; i < 1000; i++){
+		file << label_point[i] << endl;
+	}
+
+	file.close();
+*/
 	
 	return 0;
 }
