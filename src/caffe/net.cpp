@@ -695,7 +695,7 @@ void Net<Dtype>::SaveFixInfo(const string fixinfo_filename) {
     file << layers_[i]->output_fixed_width << "\t";
     file << layers_[i]->output_fixed_pos << "\t";
     if (strcmp(layers_[i]->type(),"Convolution") == 0){
-      shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
+      shared_ptr<ConvolutionLayer<Dtype> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<Dtype> >(layers_[i]);
       file << ptr->weight_fixed_width << "\t";
       file << ptr->weight_fixed_pos << "\t";
       file << ptr->bias_fixed_width << "\t";
@@ -722,7 +722,7 @@ void Net<Dtype>::LoadFixInfo(const string fixinfo_filename) {
 
     if(strcmp(layers_[i]->type(), "Convolution"))
     {
-      shared_ptr<ConvolutionLayer<float> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<float> >(layers_[i]);
+      shared_ptr<ConvolutionLayer<Dtype> > ptr = boost::dynamic_pointer_cast<ConvolutionLayer<Dtype> >(layers_[i]);
       ss >> ptr->weight_fixed_width;
       ss >> ptr->weight_fixed_pos;
       ss >> ptr->bias_fixed_width;
