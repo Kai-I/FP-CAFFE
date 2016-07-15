@@ -320,6 +320,12 @@ class Layer {
     input_fixed_width = width;
     output_fixed_width = width;
   }
+
+  virtual inline void SetConvertFlag() {
+    need_input_conv = false;
+    need_output_conv = false;
+  }
+
   // Fix data and params
   virtual void FixParams() {}
   virtual void FixData(const vector<Blob<Dtype>*>& bottom,
@@ -336,6 +342,10 @@ class Layer {
   // Fixed point position for input and output
   int input_fixed_pos;
   int output_fixed_pos;
+
+  // Flags to check if need to data conversion
+  bool need_input_conv;
+  bool need_output_conv;
 
  protected:
   /** The protobuf that stores the layer parameters */

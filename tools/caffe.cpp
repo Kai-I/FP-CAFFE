@@ -366,48 +366,48 @@ int fix() {
   LOG(INFO) << "Forward running before fix.";
   caffe_net.FixSetup(0);
 
-  vector<int> test_score_output_id;
-  vector<float> test_score;
-  float loss = 0;
+  // vector<int> test_score_output_id;
+  // vector<float> test_score;
+  // float loss = 0;
   //for (int i = 0; i < FLAGS_iterations; ++i) {
-    float iter_loss;
-    const vector<Blob<float>*>& result =
-        caffe_net.Forward(&iter_loss);
-    loss += iter_loss;
-    int idx = 0;
-    for (int j = 0; j < result.size(); ++j) {
-      const float* result_vec = result[j]->cpu_data();
-      for (int k = 0; k < result[j]->count(); ++k, ++idx) {
-        const float score = result_vec[k];
-        //if (i == 0) {
-          test_score.push_back(score);
-          test_score_output_id.push_back(j);
-        //} else {
-        //  test_score[idx] += score;
-        //}
-        const std::string& output_name = caffe_net.blob_names()[
-            caffe_net.output_blob_indices()[j]];
-        LOG(INFO) << "One batch, " << output_name << " = " << score;
-      }
-    }
+    // float iter_loss;
+    // const vector<Blob<float>*>& result =
+        caffe_net.Forward(NULL); // &iter_loss);
+    // loss += iter_loss;
+    // int idx = 0;
+    // for (int j = 0; j < result.size(); ++j) {
+    //   const float* result_vec = result[j]->cpu_data();
+    //   for (int k = 0; k < result[j]->count(); ++k, ++idx) {
+    //     const float score = result_vec[k];
+    //     //if (i == 0) {
+    //       test_score.push_back(score);
+    //       test_score_output_id.push_back(j);
+    //     //} else {
+    //     //  test_score[idx] += score;
+    //     //}
+    //     const std::string& output_name = caffe_net.blob_names()[
+    //         caffe_net.output_blob_indices()[j]];
+    //     LOG(INFO) << "One batch, " << output_name << " = " << score;
+    //   }
+    // }
   //}
   //loss /= FLAGS_iterations;
 
-  for (int i = 0; i < test_score.size(); ++i) {
-    const std::string& output_name = caffe_net.blob_names()[
-        caffe_net.output_blob_indices()[test_score_output_id[i]]];
-    const float loss_weight = caffe_net.blob_loss_weights()[
-        caffe_net.output_blob_indices()[test_score_output_id[i]]];
-    std::ostringstream loss_msg_stream;
-    const float mean_score = test_score[i]; // / FLAGS_iterations;
-    if (loss_weight) {
-      loss_msg_stream << " (* " << loss_weight
-                      << " = " << loss_weight * mean_score << " loss)";
-    }
-    LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
-  }
+  // for (int i = 0; i < test_score.size(); ++i) {
+  //   const std::string& output_name = caffe_net.blob_names()[
+  //       caffe_net.output_blob_indices()[test_score_output_id[i]]];
+  //   const float loss_weight = caffe_net.blob_loss_weights()[
+  //       caffe_net.output_blob_indices()[test_score_output_id[i]]];
+  //   std::ostringstream loss_msg_stream;
+  //   const float mean_score = test_score[i]; // / FLAGS_iterations;
+  //   if (loss_weight) {
+  //     loss_msg_stream << " (* " << loss_weight
+  //                     << " = " << loss_weight * mean_score << " loss)";
+  //   }
+  //   LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
+  // }
 
-  LOG(INFO) << "Loss: " << loss;
+  // LOG(INFO) << "Loss: " << loss;
   LOG(INFO) << "Fix caffe network with " << FLAGS_fixwidth << " bits.";
   // Fix caffe net
   caffe_net.FixSetup(FLAGS_fixwidth);
