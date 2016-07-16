@@ -423,8 +423,8 @@ int fix() {
 }
 RegisterBrewFunction(fix);
 
-// Testfix: score a fixed model.
-int testfix() {
+// Fixtest: score a fixed model.
+int fixtest() {
   CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to score.";
   CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to score.";
   CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
@@ -497,7 +497,7 @@ int testfix() {
 
   return 0;
 }
-RegisterBrewFunction(testfix);
+RegisterBrewFunction(fixtest);
 
 
 // Time: benchmark the execution time of a model.
@@ -603,7 +603,7 @@ int main(int argc, char** argv) {
       "  train           train or finetune a model\n"
       "  test            score a model\n"
       "  fix             convert to fixed model\n"
-      "  testfix         score a fixed model\n"
+      "  fixtest         score a fixed model\n"
       "  device_query    show GPU diagnostic information\n"
       "  time            benchmark model execution time");
   // Run tool or show usage.
