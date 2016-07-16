@@ -7,15 +7,38 @@ We already modified the caffe to support fixed point operations
 The fixed point flow can be three steps:
 ### fix the network
 
+The command is `caffe fix` with three new parameters extra to the original `model` and `weights` parameters
 
-* fix the network, specify three new paramters: fixwidth, fixinfo and fixweights
-caffe fix -model prototxt -weights caffemodel -fixwidth 8 -fixinfo fixinfo.txt -fixweights fixweights.caffemodel
+* fixwidth: data width for fixed point, default value is 8
+* fixinfo: filename to save fixed point information for all layers
+* fixweights: new filename to save the weights after this fix step
 
-### run the forward with fix network: fixinfo
-caffe fix -model prototxt -weights caffemodel -fixinfo fixinfo.txt
+For example, you can run as
+```
+caffe fix -model vgg16.prototxt -weights vgg16.caffemodel -fixwidth 8 -fixinfo vgg16_fix.txt -fixweights vgg16_fix.caffemodel
+```
 
+### run fixed point forward
 
-### finetune the fixed point network
+The command is `caffe fixtest` with one new parameter `fixinfo`, and please notice that
+**we should be specify the new fixed weights file for `weights` parameter.**
+
+For example, you can run as
+```
+caffe fix -model vgg16.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
+```
+
+### finetune fixed point network
+
+After `fix` and `fixtest`, you may find the network performance become worse, you can use `train` to finetune the network.
+**Only remember that you should also use the fixed point weights file for `weights` parameter.**
+
+For example, you can run as
+```
+caffe train -solve vgg16_solver.prototxt -weights vgg16_fix.caffemodel
+```
+
+---
 
 [![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
