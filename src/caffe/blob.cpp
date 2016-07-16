@@ -581,8 +581,8 @@ Dtype fff(const Dtype f, int fragpos, int bitlen) {
 	int maxnum = ((1) << bitvalid) - 1;
 	int minnum = -(1 << bitvalid);
 	int a = 0;
-	if (fragpos >= 0) a = round(f * (1 << fragpos));
-	else a = round(f / (1 << -fragpos));
+	if (fragpos >= 0) a = int(f * (1 << fragpos));
+	else a = int(f / (1 << -fragpos));
 
 	if (a > maxnum){
 		a = maxnum;

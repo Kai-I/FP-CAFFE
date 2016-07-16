@@ -1,5 +1,22 @@
 # Caffe
 
+## Update for fixed point support
+
+We already modified the caffe to support fixed point operations
+
+The fixed point flow can be three steps:
+### fix the network
+
+
+* fix the network, specify three new paramters: fixwidth, fixinfo and fixweights
+caffe fix -model prototxt -weights caffemodel -fixwidth 8 -fixinfo fixinfo.txt -fixweights fixweights.caffemodel
+
+### run the forward with fix network: fixinfo
+caffe fix -model prototxt -weights caffemodel -fixinfo fixinfo.txt
+
+
+### finetune the fixed point network
+
 [![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 
