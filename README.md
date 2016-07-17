@@ -25,7 +25,7 @@ The command is `caffe fixtest` with one new parameter `fixinfo`, and please noti
 
 For example, you can run as
 ```
-caffe fix -model vgg16.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
+caffe fixtest -model vgg16.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
 ```
 
 ### finetune fixed point network
