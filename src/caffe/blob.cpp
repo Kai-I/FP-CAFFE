@@ -5,6 +5,7 @@
 #include "caffe/common.hpp"
 #include "caffe/syncedmem.hpp"
 #include "caffe/util/math_functions.hpp"
+#include "caffe/util/benchmark.hpp"
 
 namespace caffe {
 
@@ -568,7 +569,10 @@ int Blob<Dtype>::FixPos(int width) {
 template <typename Dtype>
 void Blob<Dtype>::Fix(int pos, int width) {
   if (width <= 0) return;
+  caffe::Timer timer;
+  timer.Start();
   TruncData(mutable_cpu_data(), count_, pos, width);
+  LOG(INFO) << "===== Conversion time: " << timer.MicroSeconds() << "us.";
   // Data may automatically synced, no need to operate gpu_data here
 // #ifndef CPU_ONLY
 //   TruncData(mutable_gpu_data(), count_, pos, width);
