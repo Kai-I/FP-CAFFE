@@ -502,9 +502,10 @@ RegisterBrewFunction(fixtest);
 // Train / Finetune a model for fixed point
 int fixtune() {
   CHECK_GT(FLAGS_solver.size(), 0) << "Need a solver definition to train.";
-  CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())
-      << "Give a snapshot to resume training or weights to finetune "
-      "but not both.";
+  // CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())
+  //     << "Give a snapshot to resume training or weights to finetune "
+  //     "but not both.";
+  CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to finetune.";
   CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
   vector<string> stages = get_stages_from_flags();
 
@@ -561,12 +562,23 @@ int fixtune() {
 
   solver->SetActionFunction(signal_handler.GetActionFunction());
 
-  if (FLAGS_snapshot.size()) {
-    LOG(INFO) << "Resuming from " << FLAGS_snapshot;
-    solver->Restore(FLAGS_snapshot.c_str());
-  } else if (FLAGS_weights.size()) {
-    CopyLayers(solver.get(), FLAGS_weights);
+  // if (FLAGS_snapshot.size()) {
+  //   LOG(INFO) << "Resuming from " << FLAGS_snapshot;
+  //   solver->Restore(FLAGS_snapshot.c_str());
+  // } else if (FLAGS_weights.size()) {
+    // CopyLayers(solver.get(), FLAGS_weights);
+  // }
+
+  // Not use CopyLayers() here, only support one weights file
+  LOG(INFO) << "Finetuning from " << FLAGS_weights;
+  solver->net()->CopyTrainedLayersFrom(FLAGS_weights);
+  for (int j = 0; j < solver->test_nets().size(); ++j) {
+    solver->test_nets()[j]->CopyTrainedLayersFrom(FLAGS_weights);
   }
+
+  // Load fix info from file
+  // We are not sure here should use fixed forword or not
+  solver->net()->LoadFixInfo(FLAGS_fixinfo);
 
   if (gpus.size() > 1) {
     caffe::P2PSync<float> sync(solver, NULL, solver->param());
