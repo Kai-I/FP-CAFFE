@@ -30,12 +30,15 @@ caffe fixtest -model vgg16.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16
 
 ### finetune fixed point network
 
-After `fix` and `fixtest`, you may find the network performance become worse, you can use `train` to finetune the network.
-**Only remember that you should also use the fixed point weights file for `weights` parameter.**
+After `fix` and `fixtest`, you may find the network performance become worse, you can use `fixtune` to finetune the network.
+We should not forget that
+* use the fixed point weights file for `weights` parameter;
+* also specify `fixinfo` file;
+* specify the learning rates of all convolutional layers to 0
 
 For example, you can run as
 ```
-caffe train -solve vgg16_solver.prototxt -weights vgg16_fix.caffemodel
+caffe fixtune -solve vgg16_solver.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
 ```
 
 ---
