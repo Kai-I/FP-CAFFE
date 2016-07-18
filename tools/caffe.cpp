@@ -426,8 +426,8 @@ RegisterBrewFunction(fix);
 // Fixtest: score a fixed model.
 int fixtest() {
   CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to score.";
-  CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to score.";
   CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
+  CHECK_GT(FLAGS_fixweights.size(), 0) << "Need fixed model weights to score.";
   vector<string> stages = get_stages_from_flags();
 
   // Set device id and mode
@@ -448,7 +448,7 @@ int fixtest() {
   }
   // Instantiate the caffe net.
   Net<float> caffe_net(FLAGS_model, caffe::TEST, FLAGS_level, &stages);
-  caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
+  caffe_net.CopyTrainedLayersFrom(FLAGS_fixweights);
   LOG(INFO) << "Running for " << FLAGS_iterations << " iterations.";
 
   // Load fix info from file
@@ -505,8 +505,8 @@ int fixtune() {
   // CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())
   //     << "Give a snapshot to resume training or weights to finetune "
   //     "but not both.";
-  CHECK_GT(FLAGS_weights.size(), 0) << "Need model weights to finetune.";
   CHECK_GT(FLAGS_fixinfo.size(), 0) << "Need store a fix info file.";
+  CHECK_GT(FLAGS_fixweights.size(), 0) << "Need fixed model weights to finetune.";
   vector<string> stages = get_stages_from_flags();
 
   caffe::SolverParameter solver_param;
@@ -570,10 +570,10 @@ int fixtune() {
   // }
 
   // Not use CopyLayers() here, only support one weights file
-  LOG(INFO) << "Finetuning from " << FLAGS_weights;
-  solver->net()->CopyTrainedLayersFrom(FLAGS_weights);
+  LOG(INFO) << "Finetuning from " << FLAGS_fixweights;
+  solver->net()->CopyTrainedLayersFrom(FLAGS_fixweights);
   for (int j = 0; j < solver->test_nets().size(); ++j) {
-    solver->test_nets()[j]->CopyTrainedLayersFrom(FLAGS_weights);
+    solver->test_nets()[j]->CopyTrainedLayersFrom(FLAGS_fixweights);
   }
 
   // Load fix info from file

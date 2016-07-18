@@ -579,28 +579,28 @@ void Blob<Dtype>::Fix(int pos, int width) {
 // #endif
 }
 
-// template <typename Dtype>
-// Dtype fff(const Dtype f, int fragpos, int bitlen) {
-// 	int bitvalid = bitlen - 1;
-// 	int maxnum = ((1) << bitvalid) - 1;
-// 	int minnum = -(1 << bitvalid);
-// 	int a = 0;
-// 	if (fragpos >= 0) a = int(f * (1 << fragpos));
-// 	else a = int(f / (1 << -fragpos));
+template <typename Dtype>
+Dtype fff(const Dtype f, int fragpos, int bitlen) {
+	int bitvalid = bitlen - 1;
+	int maxnum = ((1) << bitvalid) - 1;
+	int minnum = -(1 << bitvalid);
+	int a = 0;
+	if (fragpos >= 0) a = int(f * (1 << fragpos));
+	else a = floor(f / (1 << -fragpos));
 
-// 	if (a > maxnum){
-// 		a = maxnum;
-// 	}
-// 	else if (a < minnum){
-// 		a = minnum;
-// 	}
+	if (a > maxnum){
+		a = maxnum;
+	}
+	else if (a < minnum){
+		a = minnum;
+	}
 
-// 	Dtype result;
+	Dtype result;
 
-// 	if (fragpos >= 0) result = Dtype(a) / Dtype(1 << fragpos);
-// 	else result = Dtype(a) * Dtype(1 << -fragpos);
-// 	return result;
-// }
+	if (fragpos >= 0) result = Dtype(a) / Dtype(1 << fragpos);
+	else result = Dtype(a) * Dtype(1 << -fragpos);
+	return result;
+}
 
 template <typename Dtype>
 Dtype float2fixed(const Dtype f, float scale, float inv_scale, int min, int max) {
@@ -624,8 +624,8 @@ void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
   int min = -(1 << (width-1));
   int max = -min - 1;
   for (int i = 0; i < count; i++) {
-      //data[i] = fff(data[i], pos, width);
-      data[i] = float2fixed(data[i], scale, inv_scale, min, max);
+      data[i] = fff(data[i], pos, width);
+      //data[i] = float2fixed(data[i], scale, inv_scale, min, max);
   }
 }
 
