@@ -21,24 +21,24 @@ caffe fix -model vgg16.prototxt -weights vgg16.caffemodel -fixwidth 8 -fixinfo v
 ### run fixed point forward
 
 The command is `caffe fixtest` with one new parameter `fixinfo`, and please notice that
-**we should be specify the new fixed weights file for `weights` parameter.**
+**we should be specify the new fixed weights file for `fixweights` parameter.**
 
 For example, you can run as
 ```
-caffe fixtest -model vgg16.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
+caffe fixtest -model vgg16.prototxt -fixweights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
 ```
 
 ### finetune fixed point network
 
 After `fix` and `fixtest`, you may find the network performance become worse, you can use `fixtune` to finetune the network.
 We should not forget that
-* use the fixed point weights file for `weights` parameter;
+* use the fixed point weights file for `fixweights` parameter;
 * also specify `fixinfo` file;
 * specify the learning rates of all convolutional layers to 0
 
 For example, you can run as
 ```
-caffe fixtune -solve vgg16_solver.prototxt -weights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
+caffe fixtune -solve vgg16_solver.prototxt -fixweights vgg16_fix.caffemodel -fixinfo vgg16_fix.txt
 ```
 
 ---
