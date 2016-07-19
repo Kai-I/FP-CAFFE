@@ -560,11 +560,11 @@ void Net<Dtype>::Fix() {
 	split_bottom_.clear();
 
 	//fix single layers and find out concat & split layers
-    for (int i = 0; i < layers_.size(); ++i) {
+  for (int i = 0; i < layers_.size(); ++i) {
 
 		shared_ptr<Layer<Dtype> > thislayer = layers_[i];
 
-        layers_[i]->FixParams();
+    layers_[i]->FixParams();
 		layers_[i]->FixData( bottom_vecs()[i], top_vecs()[i]);
 
 		pair<vector<int>, int> cat_top; cat_top.first.clear();

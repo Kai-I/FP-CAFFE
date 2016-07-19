@@ -232,8 +232,9 @@ class Blob {
 
   // Translate data in blob to fixed like float/double
   int FixPos(int width);
-  void Fix(int pos, int width);
-  void TruncData(Dtype* data, int count, int pos, int width);
+  void FixData(int pos, int width);
+  void FixParams(int pos, int width);
+  //void TruncData(Dtype* data, int count, int pos, int width);
 
   /// @brief Compute the sum of absolute values (L1 norm) of the data.
   Dtype asum_data() const;

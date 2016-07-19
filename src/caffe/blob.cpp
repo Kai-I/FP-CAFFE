@@ -567,19 +567,6 @@ int Blob<Dtype>::FixPos(int width) {
 }
 
 template <typename Dtype>
-void Blob<Dtype>::Fix(int pos, int width) {
-  if (width <= 0) return;
-  // caffe::Timer timer;
-  // timer.Start();
-  TruncData(mutable_cpu_data(), count_, pos, width);
-  // LOG(INFO) << "===== Conversion time: " << timer.MicroSeconds() << "us.";
-  // Data may automatically synced, no need to operate gpu_data here
-// #ifndef CPU_ONLY
-//   TruncData(mutable_gpu_data(), count_, pos, width);
-// #endif
-}
-
-template <typename Dtype>
 Dtype fff(const Dtype f, int fragpos, int bitlen) {
 	int bitvalid = bitlen - 1;
 	int maxnum = ((1) << bitvalid) - 1;
@@ -603,7 +590,15 @@ Dtype fff(const Dtype f, int fragpos, int bitlen) {
 }
 
 template <typename Dtype>
-Dtype float2fixed(const Dtype f, float scale, float inv_scale, int min, int max) {
+Dtype float2fixed_round(const Dtype f, float scale, float inv_scale, int min, int max) {
+  float a = round(f * scale);
+  if (a > max) a = max;
+  else if (a < min) a = min;
+  return Dtype(a) * inv_scale;
+}
+
+template <typename Dtype>
+Dtype float2fixed_floor(const Dtype f, float scale, float inv_scale, int min, int max) {
   float a = floor(f * scale); // use floor to emulate hardware trunc operation
   if (a > max) a = max;
   else if (a < min) a = min;
@@ -611,7 +606,7 @@ Dtype float2fixed(const Dtype f, float scale, float inv_scale, int min, int max)
 }
 
 template <typename Dtype>
-void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
+void TruncParams(Dtype* data, int count, int pos, int width) {
   float scale = 1.0;
   float inv_scale = 1.0;
   if (pos >= 0) {
@@ -624,9 +619,46 @@ void Blob<Dtype>::TruncData(Dtype* data, int count, int pos, int width) {
   int min = -(1 << (width-1));
   int max = -min - 1;
   for (int i = 0; i < count; i++) {
-      data[i] = fff(data[i], pos, width);
-      //data[i] = float2fixed(data[i], scale, inv_scale, min, max);
+      data[i] = float2fixed_round(data[i], scale, inv_scale, min, max);
   }
+}
+
+template <typename Dtype>
+void TruncData(Dtype* data, int count, int pos, int width) {
+  float scale = 1.0;
+  float inv_scale = 1.0;
+  if (pos >= 0) {
+    scale = float(1 << pos);
+    inv_scale = 1.0 / scale;
+  } else {
+    inv_scale = float(1 << -pos);
+    scale = 1.0 / inv_scale;
+  }
+  int min = -(1 << (width-1));
+  int max = -min - 1;
+  for (int i = 0; i < count; i++) {
+      // data[i] = fff(data[i], pos, width);
+      data[i] = float2fixed_floor(data[i], scale, inv_scale, min, max);
+  }
+}
+
+template <typename Dtype>
+void Blob<Dtype>::FixParams(int pos, int width) {
+  if (width <= 0) return;
+  TruncParams(mutable_cpu_data(), count_, pos, width);
+}
+
+template <typename Dtype>
+void Blob<Dtype>::FixData(int pos, int width) {
+  if (width <= 0) return;
+  // caffe::Timer timer;
+  // timer.Start();
+  TruncData(mutable_cpu_data(), count_, pos, width);
+  // LOG(INFO) << "===== Conversion time: " << timer.MicroSeconds() << "us.";
+  // Data may automatically synced, no need to operate gpu_data here
+// #ifndef CPU_ONLY
+//   TruncData(mutable_gpu_data(), count_, pos, width);
+// #endif
 }
 
 INSTANTIATE_CLASS(Blob);
